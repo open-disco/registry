@@ -38,3 +38,5 @@ ehthumbs.db
 Thumbs.db
 *~
 
+# Registry storage
+data/
