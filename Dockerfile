@@ -9,6 +9,8 @@ RUN apk add --no-cache bash
 RUN mkdir /app
 WORKDIR /app
 
+RUN npm install -g nodemon
+
 COPY ./scripts/*.sh /
 RUN chmod +x /*.sh
 
