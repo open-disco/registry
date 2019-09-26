@@ -44,19 +44,30 @@ function main(req, res, parts, respond) {
 }
 
 function postBind(req, res, respond) {
-  var body, doc, msg;
+  var body, doc, msg, contentType;
 
+  contentType = req.headers["content-type"];
   body = '';
-  
+
   // collect body
   req.on('data', function(chunk) {
     body += chunk;
   });
 
+  // If there is no body, get the query string parameters;
+  // maybe they were passed in there.
+  if (!body) {
+    q = req.url.split('?');
+    if (q[1] !== undefined) {
+      body = q[1];
+      contentType = 'application/x-www-form-urlencoded';
+    }
+  }
+
   // process body
   req.on('end', function() {
     //try {
-      msg = utils.parseBody(body, req.headers["content-type"]);
+      msg = utils.parseBody(body, contentType);
       if(msg.sourceRegID && msg.targetRegID) {
         var dt = new Date();
         var token = config.registryKey + ":"+msg.sourceRegID+":"+msg.targetRegID+":"+dt.toUTCString();
@@ -68,10 +79,11 @@ function postBind(req, res, respond) {
         console.log(Buffer.from(msg.bindToken.substring(7),'base64').toString('ascii'));
       }
       else {
+        doc = {};
         doc.type="error"
         doc.message="Not Found";
         doc.code = 404;
-      }      
+      }
       if(doc && doc.type==='error') {
         doc = utils.errorResponse(req, res, doc.message, doc.code);
       }

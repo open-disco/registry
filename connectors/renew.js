@@ -42,19 +42,30 @@ function main(req, res, parts, respond) {
 }
 
 function postRenew(req, res, respond) {
-  var body, doc, msg;
+  var body, doc, msg, contentType;
 
+  contentType = req.headers["content-type"];
   body = '';
-  
+
   // collect body
   req.on('data', function(chunk) {
     body += chunk;
   });
 
+  // If there is no body, get the query string parameters;
+  // maybe they were passed in there.
+  if (!body) {
+    q = req.url.split('?');
+    if (q[1] !== undefined) {
+      body = q[1];
+      contentType = 'application/x-www-form-urlencoded';
+    }
+  }
+
   // process body
   req.on('end', function() {
     try {
-      msg = utils.parseBody(body, req.headers["content-type"]);
+      msg = utils.parseBody(body, contentType);
       msg.id = msg.registryID;
       msg.renewLastPing = new Date();
       doc = registry('update', msg.id, msg);
