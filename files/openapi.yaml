@@ -12,6 +12,57 @@ servers:
 
 components:
   schemas:
+    BindEntity:
+      title: Bind Entity
+      description: |-
+        Represents a service (source) that uses another service (target).
+      type: object
+      required:
+        - sourceRegID
+        - targetRegID
+      properties:
+        registryID:
+          title: Registry ID
+          description: Unique registry id of the bound services.
+          type: string
+          example: 1toelqaz3t2
+          readOnly: true
+        registryKey:
+          title: Registry Key
+          type: string
+          format: uuid
+          example: ecc01cda-689a-4237-9590-9be7d45bd5ad
+          readOnly: true
+        sourceRegID:
+          title: Source registryID
+          description: The ID of the service *asking* for a connection.
+          type: string
+          example: 2b90pmx7ygd
+        targetRegID:
+          title: Target registryID
+          description: The ID of the service to be *used* by the *asking* service.
+          type: string
+          example: dgy7xmp09b2
+        bindToken:
+          title: Bind Token
+          type: string
+          readOnly: true
+        dateCreated:
+          description: |-
+            The RFC 3339 date-time string of the time the bind record was added to
+            the registry
+          type: string
+          format: date-time
+          example: '2018-05-16T12:40:29Z'
+          readOnly: true
+        dateUpdated:
+          description: |-
+            The RFC 3339 date-time string of the time the bind record was updated
+            in the registry
+          type: string
+          format: date-time
+          example: '2018-05-16T12:40:29Z'
+          readOnly: true
     DiscoCollection:
       title: Disco Collection
       type: object
@@ -124,7 +175,7 @@ components:
             the registry
           type: string
           format: date-time
-          example: 2019-09-23T13:21:02Z
+          example: '2019-09-23T13:21:02Z'
           readOnly: true
         dateUpdated:
           description: |-
@@ -132,7 +183,7 @@ components:
             in the registry
           type: string
           format: date-time
-          example: 2019-09-24T23:56:42Z
+          example: '2019-09-24T23:56:42Z'
           readOnly: true
 
 paths:
@@ -358,39 +409,22 @@ paths:
         The bind action is used by a service to inform the registry that the
         service intends to "use" that service in subsequent interactions.
       operationId: bind
-      parameters:
-        - name: sourceRegistryID
-          description: The ID of the service *asking* for a connection.
-          in: query
-          required: true
-          schema:
-            type: string
-            example: 2b90pmx7ygd
-        - name: targetRegistryID
-          description: The ID of the service to be *used* by the *asking* service.
-          in: query
-          required: true
-          schema:
-            type: string
-            example: dgy7xmp09b2
+      requestBody:
+        description: Bind entity used to bind services.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindEntity'
       responses:
         200:
           description: |-
-            The `bindToken` representing the connection between the two
-            services, as well as an array containing the bound services.
+            A bind entity used to represent the relationship between two
+            services in the registry.
           content:
             application/json:
               schema:
-                allOf:
-                  - type: object
-                    properties:
-                      bindToken:
-                        description: |-
-                          A unique token that identifies the binding between the
-                          two services in the registry.
-                        type: string
-                        example: 219aa45b-1c4a-4a7e-af07-305d855df12e
-                  - $ref: '#/components/schemas/DiscoCollection'
+                $ref: '#/components/schemas/BindEntity'
         403:
           description: |-
             The requesting client does not have permission to bind the services.
