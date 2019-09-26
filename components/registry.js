@@ -16,7 +16,7 @@ function main(action, args1, args2, args3) {
   elm = 'disco';
     
   props = [
-    "id",
+    "registryID",
     "serviceURL",
     "serviceName",
     "semanticProfile",
@@ -76,7 +76,7 @@ function addEntry(elm, entry, props) {
   
   item = {}
   for(i=0,x=props.length;i<x;i++) {
-    if(props[i]!=="id") {
+    if(props[i]!=="registryID") {
       item[props[i]] = (entry[props[i]]||"");
     }
   }
@@ -114,7 +114,7 @@ function updateEntry(elm, id, entry, props) {
   else {
     item = check;
     for(i=0,x=props.length; i<x; i++) {
-      if(props[i]!=="id") {
+      if(props[i]!=="registryID") {
         item[props[i]] = (entry[props[i]]===undefined?check[props[i]]:entry[props[i]]);
       }
     }

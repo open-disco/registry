@@ -128,8 +128,8 @@ function processItems(data, root) {
         rtn += '<tr class="item '+prop+'" >';
         rtn += '<th class="right aligned" style="text-transform:capitalize;">'+prop+'</th>';
         switch (prop) {
-          case 'id':
-            rtn += '<td class="value"><a href="'+root+'/find/?id='+item[prop]+'">'+item[prop]+'</td>';
+          case 'registryID':
+            rtn += '<td class="value"><a href="'+root+'/find/?registryID='+item[prop]+'">'+item[prop]+'</td>';
             break;
           case 'serviceURL':
           case 'healthURL':
@@ -187,7 +187,7 @@ function getForm(data, item, related) {
   rtn = rtn.replace(/{rel}/g,(data.rel||""));
   rtn = rtn.replace(/{className}/g,"form");
   if(item && item!==null) {
-    rtn = rtn.replace(/{key}/g, (item.id||""));
+    rtn = rtn.replace(/{key}/g, (item.registryID||""));
   }
   rtn += '<fieldset>';
   rtn += '<legend>'+(data.prompt||data.name)+'</legend>';
@@ -275,7 +275,7 @@ function getItemActions(coll, item, target) {
       rtn = rtn.replace(/{prompt}/g, (coll[i].prompt||coll[i].name));
       rtn = rtn.replace(/{description}/g, (coll[i].description||(coll[i].prompt||coll[i].name)));
       rtn = rtn.replace(/{className}/g, (coll[i].html && coll[i].html.className?coll[i].html.className:"item"));
-      rtn = rtn.replace(/{key}/g, (item.id||""));
+      rtn = rtn.replace(/{key}/g, (item.registryID||""));
     }
   }
   

@@ -70,7 +70,7 @@ function acceptEntry(req, res, respond) {
     } 
     else {
       respond(req, res, {code:301, doc:doc, 
-        headers:{'location':'//'+req.headers.host+"/find/?id="+doc.id}
+        headers:{'location':'//'+req.headers.host+"/find/?registryID="+doc.registryID}
       });
     }
   });

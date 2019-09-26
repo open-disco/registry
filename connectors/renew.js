@@ -68,7 +68,7 @@ function postRenew(req, res, respond) {
     }
 
     respond(req, res, {code:301, doc:(!doc?"":doc), 
-      headers:{'location':'//'+req.headers.host+"/find/?id="+msg.id}
+      headers:{'location':'//'+req.headers.host+"/find/?registryID="+msg.id}
     });
   });
 }

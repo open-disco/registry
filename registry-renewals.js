@@ -30,14 +30,14 @@ function main(args) {
         t = new Date();
         d.setTime(d.getTime() + parseInt(list[i].renewTTL));
         if(t>d) {
-          registry('remove',list[i].id);
-          console.log('removed (expired): '+list[i].id + ' -- ' + list[i].serviceURL);
+          registry('remove',list[i].registryID);
+          console.log('removed (expired): '+list[i].registryID + ' -- ' + list[i].serviceURL);
         }
       }
       // unable to renew or health-check
       if((!list[i].renewTTL || list[i].renewTTL==='') && (!list[i].healthURL || list[i].healthURL==='')) {
-         registry('remove',list[i].id);
-         console.log('removed (invalid): '+list[i].id + ' -- ' + list[i].serviceURL);
+         registry('remove',list[i].registryID);
+         console.log('removed (invalid): '+list[i].registryID + ' -- ' + list[i].serviceURL);
        }
     }
   }

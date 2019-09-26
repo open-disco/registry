@@ -16,7 +16,7 @@ function main(action, args1, args2, args3) {
   elm = 'bind';
     
   props = [
-    "id",
+    "registryID",
     "registryKey",
     "sourceRegID",
     "targetRegID",

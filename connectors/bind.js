@@ -80,8 +80,30 @@ function postBind(req, res, respond) {
     //  doc = utils.errorResponse(req, res, 'Server Error', 500);
    //}
 
-    respond(req, res, {code:301, doc:doc, 
-      headers:{'location':'//'+req.headers.host+"/bind/?id="+doc.id}
+    var responseCode, responseDoc, responseHeaders;
+
+    responseCode = 302;
+    if (doc.hasOwnProperty('code')) {
+        responseCode = doc.code;
+    }
+
+    responseDoc = doc;
+    if (doc.hasOwnProperty('doc')) {
+        responseDoc = doc.doc;
+    }
+
+    responseHeaders = {
+      'location' : '//' + req.headers.host + '/bind/?registryID=' + doc.registryID
+    };
+
+    if (responseCode !== 302) {
+      responseHeaders = {};
+    }
+
+    respond(req, res, {
+      code: responseCode,
+      doc: responseDoc,
+      headers: responseHeaders
     });
   });
 }
