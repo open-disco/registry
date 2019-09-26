@@ -1,0 +1,7 @@
+version: '3.4'
+services:
+  disco-registry:
+    image: open-disco-newman
+    ports:
+      - "8282:8282"
+    command: []
