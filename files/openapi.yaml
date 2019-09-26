@@ -1,0 +1,399 @@
+openapi: 3.0.2
+
+info:
+  title: DISCO Server
+  contact:
+    url: http://www.open-disco.org
+  version: 'v1.0.0'
+
+servers:
+  - url: http://rwmbook-registry.herokuapp.com
+    description: DISCO Registry Reference Implementation
+
+components:
+  schemas:
+    DiscoCollection:
+      title: Disco Collection
+      type: object
+      properties:
+        disco:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoEntity'
+    DiscoEntity:
+      title: Disco Entity
+      type: object
+      required:
+        - serviceName
+        - serviceURL
+      properties:
+        registryID:
+          title: Registry ID
+          description: Unique registry id of the service.
+          type: string
+          example: 2b90pmx7ygd
+          readOnly: true
+        registryURL:
+          title: Registry URL
+          description: The unique URL of the service in the registry.
+          type: string
+          example: http://disco.example.com/2b90pmx7ygd
+          readOnly: true
+        serviceURL:
+          title: Service URL
+          description: URL of the service.
+          type: string
+          format: uri
+          example: https://api.example.com
+        serviceName:
+          title: Service Name
+          description: Non-unique, human-readable name of the service.
+          type: string
+          example: Acme Widgets
+        semanticProfile:
+          title: Semantic Profile
+          description: |-
+            A profile URL describing the particular semantics of the service.
+          type: string
+          format: uri
+          example: http://acme.example.com/profile
+        requestMediaType:
+          title: Request Media Type
+          description: The request media type(s) supported by the service.
+          type: string
+          example: application/json
+        responseMediaType:
+          title: Response Media Type
+          description: The media type(s) returned by the service.
+          type: string
+          example: application/json
+        healthURL:
+          title: Health Check URL
+          description: A URL that may be used to check the health of the service.
+          type: string
+          format: uri
+          example: https://api.example.com/health-check
+        healthTTL:
+          title: Health Check Time-to-Live
+          description: |-
+            The maximum amount of time (in seconds) to wait before timing out a
+            response from the service's health check URL and treating the service as
+            *unhealthy*.
+          type: integer
+          example: 30
+        healthLastPing:
+          title: Last Health Check Ping
+          description: |-
+            The RFC 3339 date-time string of the last time the health check URL was
+            requested.
+          type: string
+          format: date-time
+          example: '2019-09-26T15:48:10Z'
+          readOnly: true
+        renewURL:
+          title: Renew URL
+          description: A URL the service may use to ping the registry.
+          type: string
+          format: uri
+          example: https://disco.example.com/renew
+        renewTTL:
+          title: Renew Check Time-to-Live
+          description: |-
+            The maximum amount of time (in seconds) to wait between renewal pings
+            from the service before treating the service as *unhealthy*.
+          type: integer
+          example: 86400
+        renewLastPing:
+          title: Last Renew Ping
+          description: |-
+            The RFC 3339 date-time string of the last time the service pinged the
+            registry with a renew request.
+          type: string
+          format: date-time
+          example: '2019-09-25T17:34:08Z'
+          readOnly: true
+        tags:
+          title: Tags
+          description: |-
+            A space-separated list of tags to describe the service.
+          type: string
+          example: acme api widgets
+        dateCreated:
+          description: |-
+            The RFC 3339 date-time string of the time the service record was added to
+            the registry
+          type: string
+          format: date-time
+          example: 2019-09-23T13:21:02Z
+          readOnly: true
+        dateUpdated:
+          description: |-
+            The RFC 3339 date-time string of the time the service record was updated
+            in the registry
+          type: string
+          format: date-time
+          example: 2019-09-24T23:56:42Z
+          readOnly: true
+
+paths:
+  '/find/':
+    get:
+      parameters:
+        - name: registryURL
+          in: query
+          description: |-
+            Search by the URL identifying the service in the registry.
+          schema:
+            type: string
+            format: uri
+            example: https://disco.example.com/service/2b90pmx7ygd
+        - name: registryID
+          in: query
+          description: |-
+            Search by the unique registry identifier for the service.
+          schema:
+            type: string
+            example: 2b90pmx7ygd
+        - name: serviceURL
+          in: query
+          description: |-
+            Search by the service URL.
+          schema:
+            type: string
+            example: https://api.example.com
+        - name: serviceName
+          in: query
+          description: |-
+            Search by the non-unique, human-readable name of the service.
+          schema:
+            type: string
+            example: Acme API
+        - name: tags
+          in: query
+          description: |-
+            Search by a space-separated list of filter tag words.
+          schema:
+            type: string
+            example: acme widgets
+        - name: status
+          in: query
+          description: Search by the current status of service.
+          schema:
+            type: string
+            enum:
+              - up
+              - down
+              - unknown
+            example: up
+        - name: semanticProfile
+          in: query
+          description: |-
+            Search by the profile URL describing the particular semantics of
+            the service.
+          schema:
+            type: string
+            example: http://acme.example.com/profile
+        - name: mediaType
+          in: query
+          description: |-
+            Search by a space-separated list of media type identifiers that may
+            be used as the `requestMediaType` or `responseMediaType` for a
+            service.
+          schema:
+            type: string
+            example: 'application/json application/hal+json'
+        - name: healthURL
+          in: query
+          description: |-
+            Search by the URL that may be used to check the health of the service.
+          schema:
+            type: string
+            example: https://api.example.com/health-check
+        - name: healthTTL
+          in: query
+          description: |-
+            Search by the maximum amount of time (in seconds) to wait before
+            timing out a response from the service's health check URL and
+            treating the service as *unhealthy*.
+          schema:
+            type: integer
+            example: 3600
+        - name: healthLastPing
+          in: query
+          description: |-
+            Search by the last date/time of successful health ping. Must be
+            formatted according to RFC 3339.
+          schema:
+            type: string
+            format: date-time
+            example: '2019-09-26T17:07:12Z'
+        - name: bindCount
+          in: query
+          description: |-
+            Search by the number of estimated clients using the service.
+          schema:
+            type: integer
+            example: 1000
+        - name: renewURL
+          in: query
+          description: |-
+            Search by the URL that may be used to renew the service in the
+            registry.
+          schema:
+            type: string
+            format: uri
+            example: https://disco.example.com/renew
+        - name: renewTTL
+          in: query
+          description: |-
+            Search by the maximum amount of time (in seconds) to wait between
+            renewal pings from the service before treating the service as
+            *unhealthy*.
+          schema:
+            type: integer
+            example: 86400
+        - name: renewLastPing
+          in: query
+          description: |-
+            Search by the last date/time of successful renewal. Must be
+            formatted according to RFC 3339.
+          schema:
+            type: string
+            format: date-time
+            example: '2019-09-26T17:07:12Z'
+      summary: Search for services in the registry
+      operationId: find
+      responses:
+        200:
+          description: |-
+            An array of registered services matching the search parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoCollection'
+  '/reg/':
+    post:
+      summary: Register a service in the registry
+      operationId: register
+      requestBody:
+        description: Service entity to register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscoEntity'
+      responses:
+        200:
+          description: |-
+            An array of services containing the single service registered.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoCollection'
+        403:
+          description: |-
+            The requesting client does not have permission to register the
+            given service entity.
+  '/unreg/':
+    post:
+      summary: Unregister a service in the registry
+      operationId: unregister
+      parameters:
+        - name: registryID
+          description: The ID of the service to unregister.
+          in: query
+          required: true
+          schema:
+            type: string
+            example: 2b90pmx7ygd
+      responses:
+        200:
+          description: |-
+            An empty array of services; the service was successfully unregistered.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoCollection'
+        403:
+          description: |-
+            The requesting client does not have permission to unregister the
+            given service.
+        404:
+          description: |-
+            The service requested could not be found.
+  '/renew/':
+    post:
+      summary: Renew the service record in the registry
+      description: |-
+        Services may use this endpoint to prove to the registry that it is still
+        up and running.
+      operationId: renew
+      parameters:
+        - name: registryID
+          description: The ID of the service to renew.
+          in: query
+          required: true
+          schema:
+            type: string
+            example: 2b90pmx7ygd
+      responses:
+        200:
+          description: |-
+            An array of services containing the single service renewed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoCollection'
+        403:
+          description: |-
+            The requesting client does not have permission to renew the
+            given service.
+        404:
+          description: |-
+            The service requested could not be found.
+  '/bind/':
+    post:
+      summary: Bind one service in the registry to another service
+      description: |-
+        The bind action is used by a service to inform the registry that the
+        service intends to "use" that service in subsequent interactions.
+      operationId: bind
+      parameters:
+        - name: sourceRegistryID
+          description: The ID of the service *asking* for a connection.
+          in: query
+          required: true
+          schema:
+            type: string
+            example: 2b90pmx7ygd
+        - name: targetRegistryID
+          description: The ID of the service to be *used* by the *asking* service.
+          in: query
+          required: true
+          schema:
+            type: string
+            example: dgy7xmp09b2
+      responses:
+        200:
+          description: |-
+            The `bindToken` representing the connection between the two
+            services, as well as an array containing the bound services.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      bindToken:
+                        description: |-
+                          A unique token that identifies the binding between the
+                          two services in the registry.
+                        type: string
+                        example: 219aa45b-1c4a-4a7e-af07-305d855df12e
+                  - $ref: '#/components/schemas/DiscoCollection'
+        403:
+          description: |-
+            The requesting client does not have permission to bind the services.
+        404:
+          description: |-
+            One of the services (or both) does not exist in the registry.
