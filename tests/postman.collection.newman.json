@@ -1,0 +1,375 @@
+{
+    "item": [
+        {
+            "id": "6be8f2ba-033a-47b9-bf0c-ab7a8de16499",
+            "name": "Register a service in the registry",
+            "request": {
+                "name": "Register a service in the registry",
+                "description": {},
+                "url": {
+                    "path": [
+                        "reg",
+                        ""
+                    ],
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                },
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    }
+                ],
+                "method": "POST",
+                "auth": {
+                    "type": "noauth"
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"serviceName\": \"Service Name\",\n    \"serviceURL\": \"<uri>\",\n    \"semanticProfile\": \"<uri>\",\n    \"requestMediaType\": \"<string>\",\n    \"responseMediaType\": \"<string>\",\n    \"healthURL\": \"<uri>\",\n    \"healthTTL\": \"<integer>\",\n    \"renewURL\": \"<uri>\",\n    \"renewTTL\": \"<integer>\",\n    \"tags\": \"<string>\"\n}"
+                }
+            },
+            "response": [
+                {
+                    "id": "46f5bdc1-bcbe-4c09-9627-6fac176eac82",
+                    "name": "An array of services containing the single service registered.",
+                    "originalRequest": {
+                        "url": {
+                            "path": [
+                                "register"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"serviceName\": \"<string>\",\n    \"serviceURL\": \"<uri>\",\n    \"semanticProfile\": \"<uri>\",\n    \"requestMediaType\": \"<string>\",\n    \"responseMediaType\": \"<string>\",\n    \"healthURL\": \"<uri>\",\n    \"healthTTL\": \"<integer>\",\n    \"renewURL\": \"<uri>\",\n    \"renewTTL\": \"<integer>\",\n    \"tags\": \"<string>\"\n}"
+                        }
+                    },
+                    "status": "Created",
+                    "code": 201,
+                    "header": [
+                        {
+                            "key": "Location",
+                            "value": "<uri>",
+                            "description": "The registry URL for the service."
+                        },
+                        {
+                            "key": "Accept",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n \"disco\": [\n  {\n   \"serviceName\": \"<string>\",\n   \"serviceURL\": \"<uri>\",\n   \"registryID\": \"<string>\",\n   \"registryURL\": \"<string>\",\n   \"semanticProfile\": \"<uri>\",\n   \"requestMediaType\": \"<string>\",\n   \"responseMediaType\": \"<string>\",\n   \"healthURL\": \"<uri>\",\n   \"healthTTL\": \"<integer>\",\n   \"healthLastPing\": \"<dateTime>\",\n   \"renewURL\": \"<uri>\",\n   \"renewTTL\": \"<integer>\",\n   \"renewLastPing\": \"<dateTime>\",\n   \"tags\": \"<string>\",\n   \"dateCreated\": \"<dateTime>\",\n   \"dateUpdated\": \"<dateTime>\"\n  },\n  {\n   \"serviceName\": \"<string>\",\n   \"serviceURL\": \"<uri>\",\n   \"registryID\": \"<string>\",\n   \"registryURL\": \"<string>\",\n   \"semanticProfile\": \"<uri>\",\n   \"requestMediaType\": \"<string>\",\n   \"responseMediaType\": \"<string>\",\n   \"healthURL\": \"<uri>\",\n   \"healthTTL\": \"<integer>\",\n   \"healthLastPing\": \"<dateTime>\",\n   \"renewURL\": \"<uri>\",\n   \"renewTTL\": \"<integer>\",\n   \"renewLastPing\": \"<dateTime>\",\n   \"tags\": \"<string>\",\n   \"dateCreated\": \"<dateTime>\",\n   \"dateUpdated\": \"<dateTime>\"\n  }\n ]\n}",
+                    "cookie": [],
+                    "_postman_previewlanguage": "json"
+                }
+            ],
+            "event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f6d573ba-adc4-4883-b415-5734e8c9f683",
+						"exec": [
+							"var data = pm.response.json();",
+                            "console.log(data);",
+                            "pm.environment.set(\"registryID\", data.disco[0].id);",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+        },
+        {
+            "id": "51458856-13f4-4c59-9281-510b74a015e5",
+            "name": "Find services in the registry by registry id",
+            "request": {
+                "name": "Find services in the registry",
+                "description": {},
+                "url": {
+                    "path": [
+                        "find",
+                        ""
+                    ],
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [
+                        {
+                            "description": "Search by the unique registry identifier for the service.",
+                            "key": "id",
+                            "value": "{{registryID}}"
+                        }
+                    ],
+                    "variable": []
+                },
+                "method": "GET",
+                "auth": {
+                    "type": "noauth"
+                },
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    }
+                ]
+            },
+            "response": [
+                {
+                    "id": "48fb0283-b737-43c5-a785-614ff79d27a8",
+                    "name": "An array of registered services matching the seach parameters.",
+                    "originalRequest": {
+                        "url": {
+                            "path": [
+                                "find"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "GET",
+                        "body": {}
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                        {
+                            "key": "Accept",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n \"disco\": [\n  {\n   \"id\": \"<string>\",\n   \"serviceURL\": \"<uri>\",\n   \"serviceName\": \"<string>\",\n   \"semanticProfile\": \"<uri>\",\n   \"requestMediaType\": \"<string>\",\n   \"responseMediaType\": \"<string>\",\n   \"healthURL\": \"<uri>\",\n   \"healthTTL\": \"<integer>\",\n   \"healthLastPing\": \"<dateTime>\",\n   \"renewTTL\": \"<integer>\",\n   \"renewLastPing\": \"<dateTime>\",\n   \"tags\": \"<string>\",\n   \"dateCreated\": \"<dateTime>\",\n   \"dateUpdated\": \"<dateTime>\"\n  },\n  {\n   \"id\": \"<string>\",\n   \"serviceURL\": \"<uri>\",\n   \"serviceName\": \"<string>\",\n   \"semanticProfile\": \"<uri>\",\n   \"requestMediaType\": \"<string>\",\n   \"responseMediaType\": \"<string>\",\n   \"healthURL\": \"<uri>\",\n   \"healthTTL\": \"<integer>\",\n   \"healthLastPing\": \"<dateTime>\",\n   \"renewTTL\": \"<integer>\",\n   \"renewLastPing\": \"<dateTime>\",\n   \"tags\": \"<string>\",\n   \"dateCreated\": \"<dateTime>\",\n   \"dateUpdated\": \"<dateTime>\"\n  }\n ]\n}",
+                    "cookie": [],
+                    "_postman_previewlanguage": "json"
+                }
+            ],
+            "event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f6d573ba-adc4-4883-b415-5734e8c9f683",
+						"exec": [
+							"var data = pm.response.json();",
+                            "console.log(data);",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+                            "tests[\"test\"] = data.disco.length == 1;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+        },
+        {
+            "id": "51458856-13f4-4c59-9281-510b74a015e5",
+            "name": "Find services in the registry",
+            "request": {
+                "name": "Find services in the registry",
+                "description": {},
+                "url": {
+                    "path": [
+                        "find",
+                        ""
+                    ],
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [
+                        {
+                            "description": "Search by the unique registry identifier for the service.",
+                            "key": "serviceName",
+                            "value": "Service Name"
+                        }
+                    ],
+                    "variable": []
+                },
+                "method": "GET",
+                "auth": {
+                    "type": "noauth"
+                },
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    }
+                ]
+            },
+            "response": [
+                {
+                    "id": "48fb0283-b737-43c5-a785-614ff79d27a8",
+                    "name": "An array of registered services matching the seach parameters.",
+                    "originalRequest": {
+                        "url": {
+                            "path": [
+                                "find"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "GET",
+                        "body": {}
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                        {
+                            "key": "Accept",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n \"disco\": [\n  {\n   \"id\": \"<string>\",\n   \"serviceURL\": \"<uri>\",\n   \"serviceName\": \"<string>\",\n   \"semanticProfile\": \"<uri>\",\n   \"requestMediaType\": \"<string>\",\n   \"responseMediaType\": \"<string>\",\n   \"healthURL\": \"<uri>\",\n   \"healthTTL\": \"<integer>\",\n   \"healthLastPing\": \"<dateTime>\",\n   \"renewTTL\": \"<integer>\",\n   \"renewLastPing\": \"<dateTime>\",\n   \"tags\": \"<string>\",\n   \"dateCreated\": \"<dateTime>\",\n   \"dateUpdated\": \"<dateTime>\"\n  },\n  {\n   \"id\": \"<string>\",\n   \"serviceURL\": \"<uri>\",\n   \"serviceName\": \"<string>\",\n   \"semanticProfile\": \"<uri>\",\n   \"requestMediaType\": \"<string>\",\n   \"responseMediaType\": \"<string>\",\n   \"healthURL\": \"<uri>\",\n   \"healthTTL\": \"<integer>\",\n   \"healthLastPing\": \"<dateTime>\",\n   \"renewTTL\": \"<integer>\",\n   \"renewLastPing\": \"<dateTime>\",\n   \"tags\": \"<string>\",\n   \"dateCreated\": \"<dateTime>\",\n   \"dateUpdated\": \"<dateTime>\"\n  }\n ]\n}",
+                    "cookie": [],
+                    "_postman_previewlanguage": "json"
+                }
+            ],
+            "event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f6d573ba-adc4-4883-b415-5734e8c9f683",
+						"exec": [
+							"var data = pm.response.json();",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+                            "tests[\"test\"] = data.disco.length == 1;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+        },
+        {
+            "id": "e02066e0-1921-400d-8a75-f89ae8076591",
+            "name": "Unregister a service in the registry",
+            "request": {
+                "name": "Unregister a service in the registry",
+                "description": {},
+                "url": {
+                    "path": [
+                        "unreg",
+                        ""
+                    ],
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [
+                        {
+                            "description": "The ID of the service to unregister.",
+                            "key": "registryID",
+                            "value": "{{registryID}}"
+                        }
+                    ],
+                    "variable": []
+                },
+                "method": "POST",
+                "auth": {
+                    "type": "noauth"
+                },
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    }
+                ]
+            },
+            "response": [
+                {
+                    "id": "12a76d1c-b1da-4c93-8881-578e9927ceee",
+                    "name": "An empty array of services; the service was successfully unregistered.",
+                    "originalRequest": {
+                        "url": {
+                            "path": [
+                                "unregister"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "registryID",
+                                    "value": "<string>"
+                                }
+                            ],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "body": {}
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                        {
+                            "key": "Accept",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n \"disco\": [\n  {\n   \"serviceName\": \"<string>\",\n   \"serviceURL\": \"<uri>\",\n   \"registryID\": \"<string>\",\n   \"registryURL\": \"<string>\",\n   \"semanticProfile\": \"<uri>\",\n   \"requestMediaType\": \"<string>\",\n   \"responseMediaType\": \"<string>\",\n   \"healthURL\": \"<uri>\",\n   \"healthTTL\": \"<integer>\",\n   \"healthLastPing\": \"<dateTime>\",\n   \"renewURL\": \"<uri>\",\n   \"renewTTL\": \"<integer>\",\n   \"renewLastPing\": \"<dateTime>\",\n   \"tags\": \"<string>\",\n   \"dateCreated\": \"<dateTime>\",\n   \"dateUpdated\": \"<dateTime>\"\n  },\n  {\n   \"serviceName\": \"<string>\",\n   \"serviceURL\": \"<uri>\",\n   \"registryID\": \"<string>\",\n   \"registryURL\": \"<string>\",\n   \"semanticProfile\": \"<uri>\",\n   \"requestMediaType\": \"<string>\",\n   \"responseMediaType\": \"<string>\",\n   \"healthURL\": \"<uri>\",\n   \"healthTTL\": \"<integer>\",\n   \"healthLastPing\": \"<dateTime>\",\n   \"renewURL\": \"<uri>\",\n   \"renewTTL\": \"<integer>\",\n   \"renewLastPing\": \"<dateTime>\",\n   \"tags\": \"<string>\",\n   \"dateCreated\": \"<dateTime>\",\n   \"dateUpdated\": \"<dateTime>\"\n  }\n ]\n}",
+                    "cookie": [],
+                    "_postman_previewlanguage": "json"
+                }
+            ],
+            "event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f6d573ba-adc4-4883-b415-5734e8c9f683",
+						"exec": [
+							"var data = pm.response.json();",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]        }
+    ],
+    "event": [],
+    "variable": [
+        {
+            "id": "baseUrl",
+            "type": "string",
+            "value": "http://localhost:8282"
+        }
+    ],
+    "info": {
+        "_postman_id": "c2897a70-59c3-4105-9612-b8046680e2c7",
+        "name": "DISCO Server",
+        "version": {
+            "raw": "v1.0.0",
+            "major": 1,
+            "minor": 0,
+            "patch": 0,
+            "prerelease": [],
+            "build": [],
+            "string": "1.0.0"
+        },
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": {
+            "content": "",
+            "type": "text/plain"
+        }
+    }
+}

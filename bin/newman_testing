@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+cd "${0%/*}/.."
+
+export ROLE=int
+
+#docker build --tag open-disco-newman .
+
+bin/dc up -d
+
+docker cp tests $(bin/dc ps -q newman):/etc/newman/tests
+
+bin/dc exec newman newman run tests/postman.collection.newman.json -e tests/postman.environment.newman.json
+
+bin/dc down

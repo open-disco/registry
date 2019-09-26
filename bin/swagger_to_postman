@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Building Postman from swagger"
+docker run -v "$(pwd)"/files:/schema --user $(id -u):$(id -g) node npx --quiet openapi-to-postmanv2 -s schema/openapi.yaml -o schema/postman.json -p
+
+echo "Modifying Postman collection"
+bin/dev-tools/postprocess_postman.py "$(pwd)"/files/postman.json "$(pwd)"/files/postman.collection.discoRegistry.json
+
+echo "Deleting temporary postman file"
+rm -rf files/postman.json
