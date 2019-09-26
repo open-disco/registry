@@ -17,6 +17,7 @@ function main(action, args1, args2, args3) {
     
   props = [
     "registryID",
+    "registryURL",
     "serviceURL",
     "serviceName",
     "semanticProfile",
@@ -25,6 +26,7 @@ function main(action, args1, args2, args3) {
     "healthURL",
     "healthTTL",
     "healthLastPing",
+    "renewURL",
     "renewTTL",
     "renewLastPing",
     "tags",

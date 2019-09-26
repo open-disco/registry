@@ -108,6 +108,12 @@ function addItem(object, item, id) {
   item.dateCreated = new Date();
   item.dateUpdated = item.dateCreated;
 
+  // If this item represents a service.
+  if (item.hasOwnProperty('serviceURL')) {
+    item.registryURL = '/find/?registryID=' + item.registryID;
+    item.renewURL = '/renew/?registryID=' + item.registryID;
+  }
+
   if (fs.existsSync(folder + object + '/' + item.registryID)) {
     rtn = utils.exception("DISCO", "Record already exists");
   } else {
