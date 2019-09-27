@@ -20,7 +20,7 @@ function main(action, args1, args2, args3) {
     "registryURL",
     "registryKey",
     "sourceRegistryID",
-    "targetRegID",
+    "targetRegistryID",
     "bindToken",
     "dateCreated",
     "dateUpdated"
@@ -69,7 +69,7 @@ function addEntry(elm, entry, props) {
   item = {}
   item.registryKey = (entry.registryKey||"");
   item.sourceRegistryID = (entry.sourceRegistryID||"");
-  item.targetRegID = (entry.targetRegID||"");
+  item.targetRegistryID = (entry.targetRegistryID||"");
   item.bindToken = (entry.bindToken||"");
   
   if(item.registryKey === "") {
@@ -78,8 +78,8 @@ function addEntry(elm, entry, props) {
   if(item.sourceRegistryID === "") {
     error += "Missing sourceRegistryID ";
   } 
-  if(item.targetRegID === "") {
-    error += "Missing targetRegID ";
+  if(item.targetRegistryID === "") {
+    error += "Missing targetRegistryID ";
   } 
   
   if(error.length!==0) {
@@ -87,11 +87,11 @@ function addEntry(elm, entry, props) {
   }
   else {
     checkSource = storage({object:'disco', action:'item', id:item.sourceRegistryID});
-    checkTarget = storage({object:'disco', action:'item', id:item.targetRegID});
+    checkTarget = storage({object:'disco', action:'item', id:item.targetRegistryID});
     if(checkSource===null || (checkSource.hasOwnProperty('type') && checkSource.type === 'error')) {
       rtn = utils.exception("File Not Found", "No record on file for sourceRegistryID=" + item.sourceRegistryID, 404);
     } else if(checkTarget===null || (checkTarget.hasOwnProperty('type') && checkTarget.type === 'error')) {
-      rtn = utils.exception("File Not Found", "No record on file for targetRegID=" + item.targetRegID, 404);
+      rtn = utils.exception("File Not Found", "No record on file for targetRegistryID=" + item.targetRegistryID, 404);
     } else {
       rtn = storage({object:elm, action:'add', item:utils.setProps(item,props)});
     }

@@ -69,7 +69,7 @@ function postBind(req, res, respond) {
     try {
       msg = utils.parseBody(body, contentType);
       var dt = new Date();
-      var token = config.registryKey + ":"+msg.sourceRegistryID+":"+msg.targetRegID+":"+dt.toUTCString();
+      var token = config.registryKey + ":"+msg.sourceRegistryID+":"+msg.targetRegistryID+":"+dt.toUTCString();
       msg.registryKey = config.registryKey;
       msg.bindToken = "simple:"+Buffer.from(token).toString('base64');
       doc = binding('add',msg);

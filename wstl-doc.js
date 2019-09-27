@@ -158,7 +158,7 @@ var wstl = [
     prompt : "Bind",
     inputs : [
       {name : "sourceRegistryID", prompt : "Source RegID", value : "", required : true},
-      {name : "targetRegID", prompt : "Target RegID", value : "", required : true}
+      {name : "targetRegistryID", prompt : "Target RegID", value : "", required : true}
     ]
   },  
   

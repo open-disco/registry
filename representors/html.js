@@ -133,7 +133,7 @@ function processItems(data, root) {
             rtn += '<td class="value"><a href="'+root+'/'+type+'/?registryID='+item[prop]+'">'+item[prop]+'</td>';
             break;
           case 'sourceRegistryID':
-          case 'targetRegID':
+          case 'targetRegistryID':
             rtn += '<td class="value"><a href="'+root+'/find/?registryID='+item[prop]+'">'+item[prop]+'</td>';
             break;
           case 'serviceURL':
