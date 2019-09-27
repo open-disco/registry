@@ -322,10 +322,10 @@ paths:
           in: query
           description: |-
             Search by the profile URL describing the particular semantics of
-            the service.
+            the service. This is a space-separated list of URLs
           schema:
             type: string
-            example: http://acme.example.com/profile
+            example: 'http://acme.example.com/profile1 http://acme.example.com/profile2'
         - name: mediaType
           in: query
           description: |-
