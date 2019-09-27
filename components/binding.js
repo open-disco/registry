@@ -17,11 +17,13 @@ function main(action, args1, args2, args3) {
     
   props = [
     "registryID",
+    "registryURL",
     "registryKey",
     "sourceRegID",
     "targetRegID",
     "bindToken",
-    "dateCreated"
+    "dateCreated",
+    "dateUpdated"
   ];
 
   switch (action) {
@@ -84,7 +86,15 @@ function addEntry(elm, entry, props) {
     rtn = utils.exception(error);
   }
   else {
-    rtn = storage({object:elm, action:'add', item:utils.setProps(item,props)});
+    checkSource = storage({object:'disco', action:'item', id:item.sourceRegID});
+    checkTarget = storage({object:'disco', action:'item', id:item.targetRegID});
+    if(checkSource===null || (checkSource.hasOwnProperty('type') && checkSource.type === 'error')) {
+      rtn = utils.exception("File Not Found", "No record on file for sourceRegID=" + item.sourceRegID, 404);
+    } else if(checkTarget===null || (checkTarget.hasOwnProperty('type') && checkTarget.type === 'error')) {
+      rtn = utils.exception("File Not Found", "No record on file for targetRegID=" + item.targetRegID, 404);
+    } else {
+      rtn = storage({object:elm, action:'add', item:utils.setProps(item,props)});
+    }
   }
   
   return rtn;

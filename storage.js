@@ -114,6 +114,11 @@ function addItem(object, item, id) {
     item.renewURL = '/renew/?registryID=' + item.registryID;
   }
 
+  // If this item represents a binding.
+  if (item.hasOwnProperty('bindToken')) {
+    item.registryURL = '/bind/?registryID=' + item.registryID;
+  }
+
   if (fs.existsSync(folder + object + '/' + item.registryID)) {
     rtn = utils.exception("DISCO", "Record already exists");
   } else {

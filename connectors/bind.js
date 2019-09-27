@@ -66,57 +66,44 @@ function postBind(req, res, respond) {
 
   // process body
   req.on('end', function() {
-    //try {
+    try {
       msg = utils.parseBody(body, contentType);
-      if(msg.sourceRegID && msg.targetRegID) {
-        var dt = new Date();
-        var token = config.registryKey + ":"+msg.sourceRegID+":"+msg.targetRegID+":"+dt.toUTCString();
-        msg.registryKey = config.registryKey;
-        msg.bindToken = "simple:"+Buffer.from(token).toString('base64');
-        doc = binding('add',msg);
-        console.log(token);
-        console.log(doc);
-        console.log(Buffer.from(msg.bindToken.substring(7),'base64').toString('ascii'));
-      }
-      else {
-        doc = {};
-        doc.type="error"
-        doc.message="Not Found";
-        doc.code = 404;
-      }
+      var dt = new Date();
+      var token = config.registryKey + ":"+msg.sourceRegID+":"+msg.targetRegID+":"+dt.toUTCString();
+      msg.registryKey = config.registryKey;
+      msg.bindToken = "simple:"+Buffer.from(token).toString('base64');
+      doc = binding('add',msg);
       if(doc && doc.type==='error') {
         doc = utils.errorResponse(req, res, doc.message, doc.code);
       }
-    //} 
-    //catch (ex) {
-    //  doc = utils.errorResponse(req, res, 'Server Error', 500);
-   //}
-
-    var responseCode, responseDoc, responseHeaders;
-
-    responseCode = 302;
-    if (doc.hasOwnProperty('code')) {
-        responseCode = doc.code;
+    }
+    catch (ex) {
+      doc = utils.errorResponse(req, res, 'Server Error', 500);
     }
 
-    responseDoc = doc;
-    if (doc.hasOwnProperty('doc')) {
-        responseDoc = doc.doc;
+    if (!doc) {
+      respond(req, res, {code:302, doc:'',
+        headers:{'location':'//'+req.headers.host+'/'}
+      });
+    } else {
+      var statusCode = 302;
+      var headers = {};
+      if (req.headers['accept'] === 'application/json') {
+        statusCode = 201;
+      }
+      if (doc.hasOwnProperty('code')) {
+        statusCode = doc.code;
+      }
+      if (doc.hasOwnProperty('registryID')) {
+        doc = {
+          bind: [doc]
+        };
+        headers = {
+          'location': '//' + req.headers.host + '/bind/?registryID=' + doc.bind[0].registryID
+        };
+      }
+      respond(req, res, {code:statusCode, doc:doc, headers:headers});
     }
-
-    responseHeaders = {
-      'location' : '//' + req.headers.host + '/bind/?registryID=' + doc.registryID
-    };
-
-    if (responseCode !== 302) {
-      responseHeaders = {};
-    }
-
-    respond(req, res, {
-      code: responseCode,
-      doc: responseDoc,
-      headers: responseHeaders
-    });
   });
 }
 
