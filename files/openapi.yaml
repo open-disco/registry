@@ -168,22 +168,26 @@ components:
           type: string
           format: uri
           example: http://acme.example.com/profile
+          nullable: true
         requestMediaType:
           title: Request Media Type
           description: The request media type(s) supported by the service.
           type: string
           example: application/json
+          nullable: true
         responseMediaType:
           title: Response Media Type
           description: The media type(s) returned by the service.
           type: string
           example: application/json
+          nullable: true
         healthURL:
           title: Health Check URL
           description: A URL that may be used to check the health of the service.
           type: string
           format: uri
           example: https://api.example.com/health-check
+          nullable: true
         healthTTL:
           title: Health Check Time-to-Live
           description: |-
@@ -191,6 +195,7 @@ components:
             response from the service's health check URL and treating the service as
             *unhealthy*.
           type: integer
+          nullable: true
           example: 30
         healthLastPing:
           title: Last Health Check Ping
@@ -200,6 +205,7 @@ components:
           type: string
           format: date-time
           example: '2019-09-26T15:48:10Z'
+          nullable: true
           readOnly: true
         renewURL:
           title: Renew URL
@@ -207,6 +213,7 @@ components:
           type: string
           format: uri-reference
           example: /renew/?registryID=2b90pmx7ygd
+          nullable: true
         renewTTL:
           title: Renew Check Time-to-Live
           description: |-
@@ -214,6 +221,7 @@ components:
             from the service before treating the service as *unhealthy*.
           type: integer
           example: 86400
+          nullable: true
         renewLastPing:
           title: Last Renew Ping
           description: |-
@@ -222,6 +230,7 @@ components:
           type: string
           format: date-time
           example: '2019-09-25T17:34:08Z'
+          nullable: true
           readOnly: true
         tags:
           title: Tags
@@ -229,6 +238,7 @@ components:
             A space-separated list of tags to describe the service.
           type: string
           example: acme api widgets
+          nullable: true
         dateCreated:
           description: |-
             The RFC 3339 date-time string of the time the service record was added to
