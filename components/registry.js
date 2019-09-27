@@ -109,8 +109,8 @@ function addEntry(elm, entry, props) {
 function updateEntry(elm, id, entry, props) {
   var rtn, check, item, error;
 
-  check = storage({object:elm, action:'item', id:id});  
-  if(check===null) {
+  check = storage({object:elm, action:'item', id:id});
+  if(check===null || (check.hasOwnProperty('type') && check.type === 'error')) {
     rtn = utils.exception("File Not Found", "No record on file", 404);
   }
   else {
@@ -150,7 +150,7 @@ function removeEntry(elm, id) {
   var rtn, check;
   
   check = storage({object:elm, action:'item', id:id});
-  if(check===null) {
+  if(check===null || (check.hasOwnProperty('type') && check.type === 'error')) {
     rtn = utils.exception("File Not Found", "No record on file", 404);
   }
   else {

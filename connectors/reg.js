@@ -69,20 +69,34 @@ function acceptEntry(req, res, respond) {
       if(doc && doc.type==='error') {
         doc = utils.errorResponse(req, res, doc.message, doc.code);
       }
-    } 
+    }
     catch (ex) {
       doc = utils.errorResponse(req, res, 'Server Error', 500);
     }
 
     if (!doc) {
-      respond(req, res, {code:301, doc:"", 
+      respond(req, res, {code:302, doc:"",
         headers:{'location':'//'+req.headers.host+"/"}
       });
-    } 
+    }
     else {
-      respond(req, res, {code:301, doc:doc, 
-        headers:{'location':'//'+req.headers.host+"/find/?registryID="+doc.registryID}
-      });
+      var statusCode = 302;
+      var headers = {};
+      if (req.headers['accept'] === 'application/json') {
+        statusCode = 201;
+      }
+      if (doc.hasOwnProperty('code')) {
+        statusCode = doc.code;
+      }
+      if (doc.hasOwnProperty('registryID')) {
+        doc = {
+          disco: [doc]
+        };
+        headers = {
+          'location': '//' + req.headers.host + '/find/?registryID=' + doc.disco[0].registryID
+        };
+      }
+      respond(req, res, {code:statusCode, doc:doc, headers:headers});
     }
   });
 }

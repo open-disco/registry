@@ -69,18 +69,38 @@ function postRenew(req, res, respond) {
       msg.id = msg.registryID;
       msg.renewLastPing = new Date();
       doc = registry('update', msg.id, msg);
-      
+
       if(doc && doc.type==='error') {
         doc = utils.errorResponse(req, res, doc.message, doc.code);
       }
-    } 
+    }
     catch (ex) {
       doc = utils.errorResponse(req, res, 'Server Error', 500);
     }
 
-    respond(req, res, {code:301, doc:(!doc?"":doc), 
-      headers:{'location':'//'+req.headers.host+"/find/?registryID="+msg.id}
-    });
+    if (!doc) {
+      respond(req, res, {code:302, doc:'',
+        headers:{'location':'//'+req.headers.host+'/'}
+      });
+    } else {
+      var statusCode = 302;
+      var headers = {};
+      if (req.headers['accept'] === 'application/json') {
+        statusCode = 200;
+      }
+      if (doc.hasOwnProperty('code')) {
+        statusCode = doc.code;
+      }
+      if (doc.hasOwnProperty('registryID')) {
+        doc = {
+          disco: [doc]
+        };
+        headers = {
+          'location': '//' + req.headers.host + '/find/?registryID=' + doc.disco[0].registryID
+        };
+      }
+      respond(req, res, {code:statusCode, doc:doc, headers:headers});
+    }
   });
 }
 
