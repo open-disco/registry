@@ -129,10 +129,10 @@ function processItems(data, root) {
         rtn += '<th class="right aligned" style="text-transform:capitalize;">'+prop+'</th>';
         switch (prop) {
           case 'registryID':
-            var type = item.hasOwnProperty('sourceRegID') ? 'bind' : 'find';
+            var type = item.hasOwnProperty('sourceRegistryID') ? 'bind' : 'find';
             rtn += '<td class="value"><a href="'+root+'/'+type+'/?registryID='+item[prop]+'">'+item[prop]+'</td>';
             break;
-          case 'sourceRegID':
+          case 'sourceRegistryID':
           case 'targetRegID':
             rtn += '<td class="value"><a href="'+root+'/find/?registryID='+item[prop]+'">'+item[prop]+'</td>';
             break;

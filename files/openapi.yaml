@@ -70,7 +70,7 @@ components:
         Represents a service (source) that uses another service (target).
       type: object
       required:
-        - sourceRegID
+        - sourceRegistryID
         - targetRegID
       properties:
         registryID:
@@ -92,7 +92,7 @@ components:
           format: uuid
           example: ecc01cda-689a-4237-9590-9be7d45bd5ad
           readOnly: true
-        sourceRegID:
+        sourceRegistryID:
           title: Source registryID
           description: The ID of the service *asking* for a connection.
           type: string
@@ -612,7 +612,7 @@ paths:
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/BindEntity'
-            example: sourceRegID=22m1h7ui94g&targetRegID=2n3iboc45rk
+            example: sourceRegistryID=22m1h7ui94g&targetRegID=2n3iboc45rk
       responses:
         201:
           description: |-
