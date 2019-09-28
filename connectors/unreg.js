@@ -32,10 +32,8 @@ function main(req, res, parts, respond) {
     sendPage(req, res, respond);
     break;
   case 'POST':
-    postRemove(req, res, respond);
-    break;  
   case 'DELETE':
-    deleteRemove(req, res, respond);
+    postRemove(req, res, respond);
     break;
   default:
     respond(req, res, utils.errorResponse(req, res, 'Method Not Allowed', 405));
@@ -44,19 +42,30 @@ function main(req, res, parts, respond) {
 }
 
 function postRemove(req, res, respond) {
-  var body, doc, msg;
+  var body, doc, msg, contentType;
 
+  contentType = req.headers["content-type"];
   body = '';
-  
+
   // collect body
   req.on('data', function(chunk) {
     body += chunk;
   });
 
+  // If there is no body, get the query string parameters;
+  // maybe they were passed in there.
+  if (!body) {
+    q = req.url.split('?');
+    if (q[1] !== undefined) {
+      body = q[1];
+      contentType = 'application/x-www-form-urlencoded';
+    }
+  }
+
   // process body
   req.on('end', function() {
     try {
-      msg = utils.parseBody(body, req.headers["content-type"]);
+      msg = utils.parseBody(body, contentType);
       console.log(msg);
       doc = registry('remove', msg.registryID);
       if(doc && doc.type==='error') {
@@ -67,44 +76,19 @@ function postRemove(req, res, respond) {
       doc = utils.errorResponse(req, res, 'Server Error', 500);
     }
 
-    if (!doc) {
-      respond(req, res, {code:301, doc:"", 
-        headers:{'location':'//'+req.headers.host+"/"}
-      });
-    } 
+    if (!doc && req.headers['accept'] === 'application/json') {
+      respond(req, res, {code:204});
+    }
     else {
-      respond(req, res, {code:301, doc:doc, 
+      var statusCode = 302;
+      if (doc && doc.hasOwnProperty('code')) {
+        statusCode = doc.code;
+      }
+      respond(req, res, {code:statusCode, doc:doc,
         headers:{'location':'//'+req.headers.host+"/"}
       });
     }
   });
-}
-
-function deleteRemove(req, res, respond) {
-  var id, doc, args;
-
-  args = utils.getQArgs(req);
-  try {
-    id = args['registryID'];
-    doc = registry('remove', id);
-    if(doc && doc.type==='error') {
-      doc = utils.errorResponse(req, res, doc.message, doc.code);
-    }
-  } 
-  catch (ex) {
-    doc = utils.errorResponse(req, res, 'Server Error', 500);
-  }
-
-  if (!doc) {
-    respond(req, res, {code:301, doc:"", 
-      headers:{'location':'//'+req.headers.host+"/"}
-    });
-  } 
-  else {
-    respond(req, res, {code:301, doc:"", 
-      headers:{'location':'//'+req.headers.host+"/"}
-    });
-  }
 }
 
 function sendPage(req, res, respond) {

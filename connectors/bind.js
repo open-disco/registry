@@ -44,45 +44,66 @@ function main(req, res, parts, respond) {
 }
 
 function postBind(req, res, respond) {
-  var body, doc, msg;
+  var body, doc, msg, contentType;
 
+  contentType = req.headers["content-type"];
   body = '';
-  
+
   // collect body
   req.on('data', function(chunk) {
     body += chunk;
   });
 
+  // If there is no body, get the query string parameters;
+  // maybe they were passed in there.
+  if (!body) {
+    q = req.url.split('?');
+    if (q[1] !== undefined) {
+      body = q[1];
+      contentType = 'application/x-www-form-urlencoded';
+    }
+  }
+
   // process body
   req.on('end', function() {
-    //try {
-      msg = utils.parseBody(body, req.headers["content-type"]);
-      if(msg.sourceRegID && msg.targetRegID) {
-        var dt = new Date();
-        var token = config.registryKey + ":"+msg.sourceRegID+":"+msg.targetRegID+":"+dt.toUTCString();
-        msg.registryKey = config.registryKey;
-        msg.bindToken = "simple:"+Buffer.from(token).toString('base64');
-        doc = binding('add',msg);
-        console.log(token);
-        console.log(doc);
-        console.log(Buffer.from(msg.bindToken.substring(7),'base64').toString('ascii'));
-      }
-      else {
-        doc.type="error"
-        doc.message="Not Found";
-        doc.code = 404;
-      }      
+    try {
+      msg = utils.parseBody(body, contentType);
+      var dt = new Date();
+      var token = config.registryKey + ":"+msg.sourceRegistryID+":"+msg.targetRegistryID+":"+dt.toUTCString();
+      msg.registryKey = config.registryKey;
+      msg.bindToken = "simple:"+Buffer.from(token).toString('base64');
+      doc = binding('add',msg);
       if(doc && doc.type==='error') {
         doc = utils.errorResponse(req, res, doc.message, doc.code);
       }
-    //} 
-    //catch (ex) {
-    //  doc = utils.errorResponse(req, res, 'Server Error', 500);
-   //}
+    }
+    catch (ex) {
+      doc = utils.errorResponse(req, res, 'Server Error', 500);
+    }
 
-    respond(req, res, {code:301, doc:doc, 
-      headers:{'location':'//'+req.headers.host+"/bind/?id="+doc.id}
-    });
+    if (!doc) {
+      respond(req, res, {code:302, doc:'',
+        headers:{'location':'//'+req.headers.host+'/'}
+      });
+    } else {
+      var statusCode = 302;
+      var headers = {};
+      if (req.headers['accept'] === 'application/json') {
+        statusCode = 201;
+      }
+      if (doc.hasOwnProperty('code')) {
+        statusCode = doc.code;
+      }
+      if (doc.hasOwnProperty('registryID')) {
+        doc = {
+          bind: [doc]
+        };
+        headers = {
+          'location': '//' + req.headers.host + '/bind/?registryID=' + doc.bind[0].registryID
+        };
+      }
+      respond(req, res, {code:statusCode, doc:doc, headers:headers});
+    }
   });
 }
 

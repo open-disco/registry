@@ -101,19 +101,30 @@ function addItem(object, item, id) {
   var rtn;
 
   if (id) {
-    item.id = id;
+    item.registryID = id;
   } else {
-    item.id = makeId();
+    item.registryID = makeId();
   }
   item.dateCreated = new Date();
   item.dateUpdated = item.dateCreated;
 
-  if (fs.existsSync(folder + object + '/' + item.id)) {
+  // If this item represents a service.
+  if (item.hasOwnProperty('serviceURL')) {
+    item.registryURL = '/find/?registryID=' + item.registryID;
+    item.renewURL = '/renew/?registryID=' + item.registryID;
+  }
+
+  // If this item represents a binding.
+  if (item.hasOwnProperty('bindToken')) {
+    item.registryURL = '/bind/?registryID=' + item.registryID;
+  }
+
+  if (fs.existsSync(folder + object + '/' + item.registryID)) {
     rtn = utils.exception("DISCO", "Record already exists");
   } else {
     try {
-      fs.writeFileSync(folder + object + '/' + item.id, JSON.stringify(item));
-      rtn = getItem(object, item.id);
+      fs.writeFileSync(folder + object + '/' + item.registryID, JSON.stringify(item));
+      rtn = getItem(object, item.registryID);
     } catch (ex) {
       rtn = null;
     }

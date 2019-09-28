@@ -14,15 +14,15 @@
   <descriptor id="serviceURL" type="semantic" text="URL of service" />
   <descriptor id="serviceName" type="semantic" text="text name of service, non-unique" />
   <descriptor id="status" type="semantic" text="current status of service [up, down, unknown" />
-  <descriptor id="profile" type="semantic" text="space separated list of profile URIs" />
+  <descriptor id="semanticProfile" type="semantic" text="space separated list of profile URIs" />
   <descriptor id="mediaType" type="semantic" text="space separated list of mediaType identifiers" />
   <descriptor id="healthURL" type="semantic" text="URL to use when sending health-check pings" />
   <descriptor id="healthTTL" type="semantic" text="time-to-live (in seconds) for a valid health-check response" />
-  <descriptor id="healthLast" type="semantic" text="last date/time registry receigved a ping from the service" />
+  <descriptor id="healthLastPing" type="semantic" text="last date/time registry receigved a ping from the service" />
   <descriptor id="bindCount" type="semantic" text="count (estimate) of clients using this service" />
   <descriptor id="renewURL" type="semantic" text="URL to use when renewing the registry entry" />
   <descriptor id="renewTTL" type="semantic" text="time-to-live (in seconds) for a valid renewal" />
-  <descriptor id="renewLast" type="semantic" text="last date/time of successful renewal" />
+  <descriptor id="renewLastPing" type="semantic" text="last date/time of successful renewal" />
 
   <!-- containers -->
   <descriptor id="registryBlock" type="semantic">
@@ -32,14 +32,14 @@
     <descriptor href="#serviceURL" />
     <descriptor href="#serviceName" />
     <descriptor href="#status" />
-    <descriptor href="#profile" />
+    <descriptor href="#semanticProfile" />
     <descriptor href="#mediaType" />
     <descriptor href="#healthURL" />
     <descriptor href="#healthTTL" />
-    <descriptor href="#healthLast" />
+    <descriptor href="#healthLastPing" />
     <descriptor href="#renewURL" />
     <descriptor href="#renewTTL" />
-    <descriptor href="#renewLast" />
+    <descriptor href="#renewLastPing" />
     <descriptor href="#bindCount" />
   </descriptor>
   
@@ -62,7 +62,7 @@
     <descriptor href="#registryURL" />
     <descriptor href="#serviceURL" />
     <descriptor href="#serviceName" />
-    <descriptor href="#profile" />
+    <descriptor href="#semanticProfile" />
     <descriptor href="#mediaType" />
     <descriptor href="#pingTTL" />
   </descriptor>

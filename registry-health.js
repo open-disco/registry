@@ -68,10 +68,10 @@ function healthSuccess(service) {
   var item;
     
   try {
-    item = registry('read',service.id);
+    item = registry('read',service.registryID);
     if(item) {
       item.healthLastPing = new Date();
-      registry('update', service.id, item);
+      registry('update', service.registryID, item);
     }
   } catch(e) {}
 }
@@ -80,8 +80,8 @@ function healthSuccess(service) {
 function healthErr(service) {
 
   try {
-    registry('remove',service.id);
-    console.log('removed (healthErr): ' + service.id + ' -- ' + service.serviceURL);
+    registry('remove',service.registryID);
+    console.log('removed (healthErr): ' + service.registryID + ' -- ' + service.serviceURL);
   } catch(e) {}
 }
 

@@ -16,12 +16,14 @@ function main(action, args1, args2, args3) {
   elm = 'bind';
     
   props = [
-    "id",
+    "registryID",
+    "registryURL",
     "registryKey",
-    "sourceRegID",
-    "targetRegID",
+    "sourceRegistryID",
+    "targetRegistryID",
     "bindToken",
-    "dateCreated"
+    "dateCreated",
+    "dateUpdated"
   ];
 
   switch (action) {
@@ -66,25 +68,33 @@ function addEntry(elm, entry, props) {
   
   item = {}
   item.registryKey = (entry.registryKey||"");
-  item.sourceRegID = (entry.sourceRegID||"");
-  item.targetRegID = (entry.targetRegID||"");
+  item.sourceRegistryID = (entry.sourceRegistryID||"");
+  item.targetRegistryID = (entry.targetRegistryID||"");
   item.bindToken = (entry.bindToken||"");
   
   if(item.registryKey === "") {
     error += "Missing registryKey ";
   }
-  if(item.sourceRegID === "") {
-    error += "Missing sourceRegID ";
+  if(item.sourceRegistryID === "") {
+    error += "Missing sourceRegistryID ";
   } 
-  if(item.targetRegID === "") {
-    error += "Missing targetRegID ";
+  if(item.targetRegistryID === "") {
+    error += "Missing targetRegistryID ";
   } 
   
   if(error.length!==0) {
     rtn = utils.exception(error);
   }
   else {
-    rtn = storage({object:elm, action:'add', item:utils.setProps(item,props)});
+    checkSource = storage({object:'disco', action:'item', id:item.sourceRegistryID});
+    checkTarget = storage({object:'disco', action:'item', id:item.targetRegistryID});
+    if(checkSource===null || (checkSource.hasOwnProperty('type') && checkSource.type === 'error')) {
+      rtn = utils.exception("File Not Found", "No record on file for sourceRegistryID=" + item.sourceRegistryID, 404);
+    } else if(checkTarget===null || (checkTarget.hasOwnProperty('type') && checkTarget.type === 'error')) {
+      rtn = utils.exception("File Not Found", "No record on file for targetRegistryID=" + item.targetRegistryID, 404);
+    } else {
+      rtn = storage({object:elm, action:'add', item:utils.setProps(item,props)});
+    }
   }
   
   return rtn;

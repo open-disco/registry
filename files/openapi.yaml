@@ -9,9 +9,119 @@ info:
 servers:
   - url: http://rwmbook-registry.herokuapp.com
     description: DISCO Registry Reference Implementation
+  - url: http://localhost:8282
+    description: Local Development Server
 
 components:
+  responses:
+    errorResponse:
+      description: An error occurred while trying to process the request.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                title: Status Code
+                description: The HTTP status code for this response.
+                type: integer
+                example: 400
+              doc:
+                title: Error Document
+                type: object
+                description: A document describing the error.
+                properties:
+                  error:
+                    title: Error
+                    type: object
+                    properties:
+                      code:
+                        title: Error Code
+                        description: |-
+                          This error's identifier, often the same as the
+                          HTTP status code.
+                        type: integer
+                        example: 400
+                      message:
+                        title: Error Message
+                        description: |-
+                          A message describing the error that occurred.
+                        type: string
+                        example: Missing serviceURL. Missing serviceName.
+                      url:
+                        title: Originating URL
+                        description: |-
+                          The requested URL where the error occurred.
+                        type: string
+                        format: uri-reference
+                        example: /reg/
   schemas:
+    BindCollection:
+      title: Bind Collection
+      type: object
+      properties:
+        bind:
+          type: array
+          items:
+            $ref: '#/components/schemas/BindEntity'
+    BindEntity:
+      title: Bind Entity
+      description: |-
+        Represents a service (source) that uses another service (target).
+      type: object
+      required:
+        - sourceRegistryID
+        - targetRegistryID
+      properties:
+        registryID:
+          title: Registry ID
+          description: Unique registry id of the bound services.
+          type: string
+          example: 1toelqaz3t2
+          readOnly: true
+        registryURL:
+          title: Registry URL
+          description: The unique URL of the binding in the registry.
+          type: string
+          format: uri-reference
+          example: /bind/?registryID=1toelqaz3t2
+          readOnly: true
+        registryKey:
+          title: Registry Key
+          type: string
+          format: uuid
+          example: ecc01cda-689a-4237-9590-9be7d45bd5ad
+          readOnly: true
+        sourceRegistryID:
+          title: Source registryID
+          description: The ID of the service *asking* for a connection.
+          type: string
+          example: 2b90pmx7ygd
+        targetRegistryID:
+          title: Target registryID
+          description: The ID of the service to be *used* by the *asking* service.
+          type: string
+          example: dgy7xmp09b2
+        bindToken:
+          title: Bind Token
+          type: string
+          readOnly: true
+        dateCreated:
+          description: |-
+            The RFC 3339 date-time string of the time the bind record was added to
+            the registry
+          type: string
+          format: date-time
+          example: '2018-05-16T12:40:29Z'
+          readOnly: true
+        dateUpdated:
+          description: |-
+            The RFC 3339 date-time string of the time the bind record was updated
+            in the registry
+          type: string
+          format: date-time
+          example: '2018-05-16T12:40:29Z'
+          readOnly: true
     DiscoCollection:
       title: Disco Collection
       type: object
@@ -37,7 +147,8 @@ components:
           title: Registry URL
           description: The unique URL of the service in the registry.
           type: string
-          example: http://disco.example.com/2b90pmx7ygd
+          format: uri-reference
+          example: /find/?registryID=2b90pmx7ygd
           readOnly: true
         serviceURL:
           title: Service URL
@@ -57,22 +168,26 @@ components:
           type: string
           format: uri
           example: http://acme.example.com/profile
+          nullable: true
         requestMediaType:
           title: Request Media Type
           description: The request media type(s) supported by the service.
           type: string
           example: application/json
+          nullable: true
         responseMediaType:
           title: Response Media Type
           description: The media type(s) returned by the service.
           type: string
           example: application/json
+          nullable: true
         healthURL:
           title: Health Check URL
           description: A URL that may be used to check the health of the service.
           type: string
           format: uri
           example: https://api.example.com/health-check
+          nullable: true
         healthTTL:
           title: Health Check Time-to-Live
           description: |-
@@ -80,6 +195,7 @@ components:
             response from the service's health check URL and treating the service as
             *unhealthy*.
           type: integer
+          nullable: true
           example: 30
         healthLastPing:
           title: Last Health Check Ping
@@ -89,13 +205,15 @@ components:
           type: string
           format: date-time
           example: '2019-09-26T15:48:10Z'
+          nullable: true
           readOnly: true
         renewURL:
           title: Renew URL
           description: A URL the service may use to ping the registry.
           type: string
-          format: uri
-          example: https://disco.example.com/renew
+          format: uri-reference
+          example: /renew/?registryID=2b90pmx7ygd
+          nullable: true
         renewTTL:
           title: Renew Check Time-to-Live
           description: |-
@@ -103,6 +221,7 @@ components:
             from the service before treating the service as *unhealthy*.
           type: integer
           example: 86400
+          nullable: true
         renewLastPing:
           title: Last Renew Ping
           description: |-
@@ -111,6 +230,7 @@ components:
           type: string
           format: date-time
           example: '2019-09-25T17:34:08Z'
+          nullable: true
           readOnly: true
         tags:
           title: Tags
@@ -118,13 +238,14 @@ components:
             A space-separated list of tags to describe the service.
           type: string
           example: acme api widgets
+          nullable: true
         dateCreated:
           description: |-
             The RFC 3339 date-time string of the time the service record was added to
             the registry
           type: string
           format: date-time
-          example: 2019-09-23T13:21:02Z
+          example: '2019-09-23T13:21:02Z'
           readOnly: true
         dateUpdated:
           description: |-
@@ -132,10 +253,22 @@ components:
             in the registry
           type: string
           format: date-time
-          example: 2019-09-24T23:56:42Z
+          example: '2019-09-24T23:56:42Z'
           readOnly: true
 
 paths:
+  '/':
+    get:
+      summary: Get all services listed in the registry
+      operationId: findAll
+      responses:
+        200:
+          description: |-
+            An array of registered services in the registry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoCollection'
   '/find/':
     get:
       parameters:
@@ -145,8 +278,8 @@ paths:
             Search by the URL identifying the service in the registry.
           schema:
             type: string
-            format: uri
-            example: https://disco.example.com/service/2b90pmx7ygd
+            format: uri-reference
+            example: /find/?registryID=2b90pmx7ygd
         - name: registryID
           in: query
           description: |-
@@ -189,10 +322,10 @@ paths:
           in: query
           description: |-
             Search by the profile URL describing the particular semantics of
-            the service.
+            the service. This is a space-separated list of URLs
           schema:
             type: string
-            example: http://acme.example.com/profile
+            example: 'http://acme.example.com/profile1 http://acme.example.com/profile2'
         - name: mediaType
           in: query
           description: |-
@@ -241,8 +374,8 @@ paths:
             registry.
           schema:
             type: string
-            format: uri
-            example: https://disco.example.com/renew
+            format: uri-reference
+            example: /renew/?registryID=2b90pmx7ygd
         - name: renewTTL
           in: query
           description: |-
@@ -282,45 +415,116 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DiscoEntity'
+          application/x-www-form-urlencode:
+            schema:
+              $ref: '#/components/schemas/DiscoEntity'
+            example: 'serviceURL=https%3A%2F%2Fapi.example.com&serviceName=Acme+Widgets&semanticProfile=http%3A%2F%2Facme.example.com%2Fprofile&requestMediaType=application%2Fjson&responseMediaType=application%2Fjson&healthURL=https%3A%2F%2Fapi.example.com%2Fhealth-check&healthTTL=30&renewURL=%2Frenew%2F%3FregistryID%3D2b90pmx7ygd&renewTTL=86400&tags=acme+api+widgets'
       responses:
-        200:
+        201:
           description: |-
             An array of services containing the single service registered.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscoCollection'
-        403:
-          description: |-
-            The requesting client does not have permission to register the
-            given service entity.
+          headers:
+            Location:
+              description: The location of the service created.
+              schema:
+                type: string
+                format: uri-reference
+                example: /find/?registryID=1toelqaz3t2
+        default:
+          $ref: '#/components/responses/errorResponse'
   '/unreg/':
     post:
       summary: Unregister a service in the registry
-      operationId: unregister
+      operationId: unregisterPost
       parameters:
         - name: registryID
           description: The ID of the service to unregister.
           in: query
-          required: true
+          schema:
+            type: string
+            example: 1toelqaz3t2
+      requestBody:
+        required: false
+        description: |-
+          The request body may be provided instead of using a query string
+          parameter. If a request body is present, it should override any
+          value passed in the query string.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - registryID
+              properties:
+                registryID:
+                  title: Registry ID
+                  description: The ID of the service to unregister.
+                  type: string
+                  example: 1toelqaz3t2
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - registryID
+              properties:
+                registryID:
+                  title: Registry ID
+                  description: The ID of the service to unregister.
+                  type: string
+            example: registryID=1toelqaz3t2
+      responses:
+        204:
+          description: The service was unregistered.
+        default:
+          $ref: '#/components/responses/errorResponse'
+    delete:
+      summary: Unregister a service in the registry
+      operationId: unregisterDelete
+      parameters:
+        - name: registryID
+          description: The ID of the service to unregister.
+          in: query
           schema:
             type: string
             example: 2b90pmx7ygd
+      requestBody:
+        required: false
+        description: |-
+          The request body may be provided instead of using a query string
+          parameter. If a request body is present, it should override any
+          value passed in the query string.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - registryID
+              properties:
+                registryID:
+                  title: Registry ID
+                  description: The ID of the service to unregister.
+                  type: string
+                  example: 1toelqaz3t2
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - registryID
+              properties:
+                registryID:
+                  title: Registry ID
+                  description: The ID of the service to unregister.
+                  type: string
+            example: registryID=1toelqaz3t2
       responses:
-        200:
-          description: |-
-            An empty array of services; the service was successfully unregistered.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DiscoCollection'
-        403:
-          description: |-
-            The requesting client does not have permission to unregister the
-            given service.
-        404:
-          description: |-
-            The service requested could not be found.
+        204:
+          description: The service was unregistered.
+        default:
+          $ref: '#/components/responses/errorResponse'
   '/renew/':
     post:
       summary: Renew the service record in the registry
@@ -332,10 +536,38 @@ paths:
         - name: registryID
           description: The ID of the service to renew.
           in: query
-          required: true
           schema:
             type: string
             example: 2b90pmx7ygd
+      requestBody:
+        required: false
+        description: |-
+          The request body may be provided instead of using a query string
+          parameter. If a request body is present, it should override any
+          value passed in the query string.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - registryID
+              properties:
+                registryID:
+                  title: Registry ID
+                  description: The ID of the service to renew.
+                  type: string
+                  example: 2b90pmx7ygd
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - registryID
+              properties:
+                registryID:
+                  title: Registry ID
+                  description: The ID of the service to unregister.
+                  type: string
+            example: registryID=2b90pmx7ygd
       responses:
         200:
           description: |-
@@ -344,56 +576,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscoCollection'
-        403:
-          description: |-
-            The requesting client does not have permission to renew the
-            given service.
-        404:
-          description: |-
-            The service requested could not be found.
+        default:
+          $ref: '#/components/responses/errorResponse'
   '/bind/':
+    get:
+      summary: Get service bindings
+      parameters:
+        - name: registryID
+          in: query
+          description: |-
+            Search by the unique registry identifier for the service binding.
+          schema:
+            type: string
+            example: 2b90pmx7ygd
+      responses:
+        200:
+          description: An array of service bindings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindCollection'
     post:
       summary: Bind one service in the registry to another service
       description: |-
         The bind action is used by a service to inform the registry that the
         service intends to "use" that service in subsequent interactions.
       operationId: bind
-      parameters:
-        - name: sourceRegistryID
-          description: The ID of the service *asking* for a connection.
-          in: query
-          required: true
-          schema:
-            type: string
-            example: 2b90pmx7ygd
-        - name: targetRegistryID
-          description: The ID of the service to be *used* by the *asking* service.
-          in: query
-          required: true
-          schema:
-            type: string
-            example: dgy7xmp09b2
+      requestBody:
+        description: Bind entity used to bind services.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindEntity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BindEntity'
+            example: sourceRegistryID=22m1h7ui94g&targetRegistryID=2n3iboc45rk
       responses:
-        200:
+        201:
           description: |-
-            The `bindToken` representing the connection between the two
-            services, as well as an array containing the bound services.
+            An array of service bindings containing the single binding created
+            between two services.
           content:
             application/json:
               schema:
-                allOf:
-                  - type: object
-                    properties:
-                      bindToken:
-                        description: |-
-                          A unique token that identifies the binding between the
-                          two services in the registry.
-                        type: string
-                        example: 219aa45b-1c4a-4a7e-af07-305d855df12e
-                  - $ref: '#/components/schemas/DiscoCollection'
-        403:
-          description: |-
-            The requesting client does not have permission to bind the services.
-        404:
-          description: |-
-            One of the services (or both) does not exist in the registry.
+                $ref: '#/components/schemas/BindCollection'
+          headers:
+            Location:
+              description: The location of the service binding created.
+              schema:
+                type: string
+                format: uri-reference
+                example: /bind/?registryID=1toelqaz3t2
+        default:
+          $ref: '#/components/responses/errorResponse'

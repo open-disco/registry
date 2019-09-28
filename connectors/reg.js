@@ -41,37 +41,62 @@ function main(req, res, parts, respond) {
 }
 
 function acceptEntry(req, res, respond) {
-  var body, doc, msg;
+  var body, doc, msg, contentType;
 
+  contentType = req.headers["content-type"];
   body = '';
-  
+
   // collect body
   req.on('data', function(chunk) {
     body += chunk;
   });
 
+  // If there is no body, get the query string parameters;
+  // maybe they were passed in there.
+  if (!body) {
+    q = req.url.split('?');
+    if (q[1] !== undefined) {
+      body = q[1];
+      contentType = 'application/x-www-form-urlencoded';
+    }
+  }
+
   // process body
   req.on('end', function() {
     try {
-      msg = utils.parseBody(body, req.headers["content-type"]);
+      msg = utils.parseBody(body, contentType);
       doc = registry('add', msg);
       if(doc && doc.type==='error') {
         doc = utils.errorResponse(req, res, doc.message, doc.code);
       }
-    } 
+    }
     catch (ex) {
       doc = utils.errorResponse(req, res, 'Server Error', 500);
     }
 
     if (!doc) {
-      respond(req, res, {code:301, doc:"", 
+      respond(req, res, {code:302, doc:"",
         headers:{'location':'//'+req.headers.host+"/"}
       });
-    } 
+    }
     else {
-      respond(req, res, {code:301, doc:doc, 
-        headers:{'location':'//'+req.headers.host+"/find/?id="+doc.id}
-      });
+      var statusCode = 302;
+      var headers = {};
+      if (req.headers['accept'] === 'application/json') {
+        statusCode = 201;
+      }
+      if (doc.hasOwnProperty('code')) {
+        statusCode = doc.code;
+      }
+      if (doc.hasOwnProperty('registryID')) {
+        doc = {
+          disco: [doc]
+        };
+        headers = {
+          'location': '//' + req.headers.host + '/find/?registryID=' + doc.disco[0].registryID
+        };
+      }
+      respond(req, res, {code:statusCode, doc:doc, headers:headers});
     }
   });
 }

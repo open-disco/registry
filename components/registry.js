@@ -16,7 +16,8 @@ function main(action, args1, args2, args3) {
   elm = 'disco';
     
   props = [
-    "id",
+    "registryID",
+    "registryURL",
     "serviceURL",
     "serviceName",
     "semanticProfile",
@@ -25,6 +26,7 @@ function main(action, args1, args2, args3) {
     "healthURL",
     "healthTTL",
     "healthLastPing",
+    "renewURL",
     "renewTTL",
     "renewLastPing",
     "tags",
@@ -76,7 +78,7 @@ function addEntry(elm, entry, props) {
   
   item = {}
   for(i=0,x=props.length;i<x;i++) {
-    if(props[i]!=="id") {
+    if(props[i]!=="registryID") {
       item[props[i]] = (entry[props[i]]||"");
     }
   }
@@ -107,14 +109,14 @@ function addEntry(elm, entry, props) {
 function updateEntry(elm, id, entry, props) {
   var rtn, check, item, error;
 
-  check = storage({object:elm, action:'item', id:id});  
-  if(check===null) {
+  check = storage({object:elm, action:'item', id:id});
+  if(check===null || (check.hasOwnProperty('type') && check.type === 'error')) {
     rtn = utils.exception("File Not Found", "No record on file", 404);
   }
   else {
     item = check;
     for(i=0,x=props.length; i<x; i++) {
-      if(props[i]!=="id") {
+      if(props[i]!=="registryID") {
         item[props[i]] = (entry[props[i]]===undefined?check[props[i]]:entry[props[i]]);
       }
     }
@@ -148,7 +150,7 @@ function removeEntry(elm, id) {
   var rtn, check;
   
   check = storage({object:elm, action:'item', id:id});
-  if(check===null) {
+  if(check===null || (check.hasOwnProperty('type') && check.type === 'error')) {
     rtn = utils.exception("File Not Found", "No record on file", 404);
   }
   else {
